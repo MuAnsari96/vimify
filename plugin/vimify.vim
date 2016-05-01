@@ -92,7 +92,7 @@ if len(j) is not 0:
         album = curr["album"]["name"]
         uri = curr["uri"][14:]
         vim.command("let g:trackIDs[{}] = \'{}\'".format(i, uri))
-        t = name + "    " + artist + "    " + album
+        t = "{:<45}  {:<20}  {:<}".format(name[:45], artist[:20], album)
         vim.command("let g:tracks[{}] = \'{}\'".format(i, t))
 
     vim.command("call s:VimifySearchBuffer()")
@@ -126,6 +126,7 @@ function! s:SelectSong()
    let l:track = g:trackIDs[l:row]
    echo l:row
    call s:LoadTrack(l:track)
+   setpos(1,1)
 endfunction
 " *************************************************************************** "
 " ***************************   Command Bindngs   *************************** " 
