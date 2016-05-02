@@ -10,8 +10,8 @@ if exists('g:vimifyInited')
     finish
 endif
 let g:vimifyInited = 0
-let g:trackIDs = ['','','','','','','','','','']
-let g:tracks =  ['','','','','','','','','','']
+let g:trackIDs = ['','','','','','','','','','','','','','','','','','','','']
+let g:tracks =  ['','','','','','','','','','','','','','','','','','','','']
 
 python << endpython
 import subprocess
@@ -85,11 +85,11 @@ resp = urllib.urlopen(
 j = json.loads(resp.read())["tracks"]["items"]
 if len(j) is not 0:
     tracks = ""
-    for i in range(min(10, len(j))):
+    for i in range(min(20, len(j))):
         curr = j[i]
-        name = curr["name"]
-        artist = curr["artists"][0]["name"]
-        album = curr["album"]["name"]
+        name = curr["name"].encode('ascii', 'ignore').replace("'", "")
+        artist = curr["artists"][0]["name"].encode('ascii', 'ignore').replace("'", "")
+        album = curr["album"]["name"].encode('ascii', 'ignore').replace("'", "")
         uri = curr["uri"][14:]
         vim.command("let g:trackIDs[{}] = \'{}\'".format(i, uri))
         t = "{:<45}  {:<20}  {:<}".format(name[:45], artist[:20], album)
@@ -111,22 +111,28 @@ function! s:VimifySearchBuffer()
     endif
     below new Vimify
     call append(0, 'Spotify Search Results:')
+    call append(line('$'), "Song                                           
+                           \Artist                
+                           \Album")
+    call append(line('$'), "--------------------------------------------------
+                           \------------------------------------------------")
     for track in g:tracks
         call append(line('$'), track)
     endfor
     resize 14
+    normal! gg
+    5
     setlocal nonumber
     setlocal nowrap
     setlocal buftype=nofile
     map <buffer> <Enter> <esc>:SpSelect<CR>
+
 endfunction
 
 function! s:SelectSong()
-   let l:row = getpos('.')[1]-3
+   let l:row = getpos('.')[1]-5
    let l:track = g:trackIDs[l:row]
-   echo l:row
    call s:LoadTrack(l:track)
-   setpos(1,1)
 endfunction
 " *************************************************************************** "
 " ***************************   Command Bindngs   *************************** " 
