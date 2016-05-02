@@ -1,5 +1,5 @@
 ## About
-[vimify](https://github.com/MuAnsari96/vimify) is a plugin for [Vim](https://github.com/vim/vim) that provides simple Spotify integration. Since it uses the MPRIS2 dbus interface to control Spotify, it works out of the box with all Linux systems, provided that the Vim installation was compiled with python. Currently, basic spotify controls are implemented, 
+[vimify](https://github.com/MuAnsari96/vimify) is a plugin for [Vim](https://github.com/vim/vim) that provides simple Spotify integration. Since it uses the MPRIS2 dbus interface to control Spotify, it works out of the box with all Linux systems, provided that the Vim installation was compiled with python. Currently, basic spotify controls are implemented, and more is expected to come!
 
 ## Features
 vimify is designed to interface with a running desktop instance of Spotify. Currently, the following features are supported:
