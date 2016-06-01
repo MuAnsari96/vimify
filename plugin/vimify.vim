@@ -10,14 +10,15 @@ if exists('g:vimifyInited')
     finish
 endif
 let g:vimifyInited = 0
-let g:trackIDs = ['','','','','','','','','','','','','','','','','','','','']
-let g:tracks =  ['','','','','','','','','','','','','','','','','','','','']
 
 python << endpython
 import subprocess
 import os
 import urllib
 import json
+
+IDs = []
+ListedElements = []
 endpython
 
 " *************************************************************************** "
@@ -85,15 +86,17 @@ resp = urllib.urlopen(
 j = json.loads(resp.read())["tracks"]["items"]
 if len(j) is not 0:
     tracks = ""
+    IDs = []
+    ListedElements = []
     for i in range(min(20, len(j))):
         curr = j[i]
         name = curr["name"].encode('ascii', 'ignore').replace("'", "")
         artist = curr["artists"][0]["name"].encode('ascii', 'ignore').replace("'", "")
         album = curr["album"]["name"].encode('ascii', 'ignore').replace("'", "")
         uri = curr["uri"][14:]
-        vim.command("let g:trackIDs[{}] = \'{}\'".format(i, uri))
+        IDs.append(uri)
         t = "{:<45}  {:<20}  {:<}".format(name[:45], artist[:20], album)
-        vim.command("let g:tracks[{}] = \'{}\'".format(i, t))
+        ListedElements.append(t)
 
     vim.command("call s:VimifySearchBuffer()")
 else:
@@ -116,9 +119,12 @@ function! s:VimifySearchBuffer()
                            \Album")
     call append(line('$'), "--------------------------------------------------
                            \------------------------------------------------")
-    for track in g:tracks
-        call append(line('$'), track)
-    endfor
+
+python << endpython
+import vim
+for element in ListedElements:
+    vim.command('call append(line("$"), "{}")'.format(element))
+endpython
     resize 14
     normal! gg
     5
@@ -131,8 +137,10 @@ endfunction
 
 function! s:SelectSong()
    let l:row = getpos('.')[1]-5
-   let l:track = g:trackIDs[l:row]
-   call s:LoadTrack(l:track)
+python << endpython
+import vim
+vim.command('call s:LoadTrack("{}")'.format(IDs[int(vim.eval("l:row"))]))
+endpython
 endfunction
 " *************************************************************************** "
 " ***************************   Command Bindngs   *************************** " 
