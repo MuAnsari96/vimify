@@ -19,6 +19,25 @@ import json
 
 IDs = []
 ListedElements = []
+
+def populate(track, albumName=None):
+    name = track["name"].encode('ascii', 'ignore').replace("'", "")
+    uri = track["uri"][14:]
+
+    artist = track["artists"][0]["name"].encode('ascii', 'ignore').replace("'", "")
+    artistID = track["artists"][0]["id"]
+
+    album, albumID = albumName, None
+    if album is None:
+        album = track["album"]["name"].encode('ascii', 'ignore').replace("'", "")
+        album = track["album"]["id"]
+
+    t = "{:<45}  {:<20}  {:<}".format(name[:45], artist[:20], album)
+    ListedElements.append(t)
+
+    t = {"uri": uri, "artistID": artistID, "albumID": album}
+    IDs.append(t)
+    
 endpython
 
 " *************************************************************************** "
@@ -88,21 +107,31 @@ if len(j) is not 0:
     tracks = ""
     IDs = []
     ListedElements = []
-    for i in range(min(20, len(j))):
-        curr = j[i]
-        name = curr["name"].encode('ascii', 'ignore').replace("'", "")
-        artist = curr["artists"][0]["name"].encode('ascii', 'ignore').replace("'", "")
-        album = curr["album"]["name"].encode('ascii', 'ignore').replace("'", "")
-        uri = curr["uri"][14:]
-        IDs.append(uri)
-        t = "{:<45}  {:<20}  {:<}".format(name[:45], artist[:20], album)
-        ListedElements.append(t)
+    for track in j[:min(20, len(j))]:
+        populate(track)
 
     vim.command("call s:VimifySearchBuffer()")
 else:
     vim.command("echo \'No tracks found\'")
 endpython
 endfunction 
+
+
+function! s:SearchArtist(query)
+python << endpython
+
+
+
+endpython
+endfunction
+
+function s:SearchAlbum(query)
+python << endpython
+
+
+
+endpython
+endfunction
 
 " *************************************************************************** "
 " ***************************      Interface       ************************** " 
@@ -139,7 +168,7 @@ function! s:SelectSong()
    let l:row = getpos('.')[1]-5
 python << endpython
 import vim
-vim.command('call s:LoadTrack("{}")'.format(IDs[int(vim.eval("l:row"))]))
+vim.command('call s:LoadTrack("{}")'.format(IDs[int(vim.eval("l:row"))]["uri"]))
 endpython
 endfunction
 " *************************************************************************** "
