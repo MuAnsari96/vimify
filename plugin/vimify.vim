@@ -20,22 +20,22 @@ import json
 IDs = []
 ListedElements = []
 
-def populate(track, albumName=None):
+def populate(track, albumName=None, albumIDNumber=None):
     name = track["name"].encode('ascii', 'ignore').replace("'", "")
     uri = track["uri"][14:]
 
     artist = track["artists"][0]["name"].encode('ascii', 'ignore').replace("'", "")
     artistID = track["artists"][0]["id"]
 
-    album, albumID = albumName, None
-    if album is None:
+    album, albumID = albumName, albumIDNumber
+    if album is None or albumID is None:
         album = track["album"]["name"].encode('ascii', 'ignore').replace("'", "")
         albumID = track["album"]["id"]
 
     info = {"track": name, "artist": artist, "album": album}
     ListedElements.append(info)
 
-    info = {"uri": uri, "artistID": artistID, "albumID": album}
+    info = {"uri": uri, "artistID": artistID, "albumID": albumID}
     IDs.append(info)
     
 endpython
@@ -104,45 +104,85 @@ resp = urllib.urlopen(
              )
 j = json.loads(resp.read())["tracks"]["items"]
 if len(j) is not 0:
-    tracks = ""
     IDs = []
     ListedElements = []
     for track in j[:min(20, len(j))]:
         populate(track)
 
-    vim.command("call s:VimifySearchBuffer()")
+    vim.command('call s:VimifySearchBuffer(a:query, "Search")')
 else:
-    vim.command("echo \'No tracks found\'")
+    vim.command("echo 'No tracks found'")
 endpython
 endfunction 
 
-
-function! s:SearchArtist(query)
+function s:PopulateAlbum(albumName, albumIDNumber)
 python << endpython
-
-
-
+import vim
+resp = urllib.urlopen(
+            "http://api.spotify.com/v1/albums/{}/tracks".format(
+                    vim.eval("a:albumIDNumber"))
+            )
+j = json.loads(resp.read())["items"]
+for track in j:
+    populate(track, vim.eval("a:albumName"), vim.eval("a:albumIDNumber"))
 endpython
 endfunction
 
-function s:SearchAlbum(query)
+function s:SearchAlbum(albumName, albumIDNumber)
 python << endpython
+import vim
+oldIDs = IDs
+oldListedElements = ListedElements
+IDs = []
+ListedElements = []
+vim.command('call s:PopulateAlbum(a:albumName, a:albumIDNumber)')
 
+if len(IDs) is 0:
+    IDs = oldIDs
+    ListedElements = oldListedElements
+    vim.command('echo "Invalid Album"')
 
-
+else:
+    vim.command('call s:VimifySearchBuffer(a:albumName, "Album")')
 endpython
 endfunction
+
+function! s:SearchArtist(artistName, artistIDNumber)
+python << endpython
+import vim
+oldIDs = IDs
+oldListedElements = ListedElements
+IDs = []
+ListedElements = []
+resp = urllib.urlopen(
+            "http://api.spotify.com/v1/artists/{}/albums".format(
+                    vim.eval("a:artistIDNumber"))
+            )
+j = json.loads(resp.read())["items"]
+for album in j:
+    vim.command('call s:PopulateAlbum("{}", "{}")'.format(j["name"], j["id"]))
+
+if len(IDs) is 0:
+    IDs = oldIDs
+    ListedElements = oldListedElements
+    vim.command('echo "Problem fetching artist data"')
+
+else:
+    vim.command('call s:VimifySearchBuffer(a:artistName, "Artist")')
+endpython
+endfunction
+
 
 " *************************************************************************** "
 " ***************************      Interface       ************************** " 
 " *************************************************************************** "
 
-function! s:VimifySearchBuffer()
+function! s:VimifySearchBuffer(query, type)
     if buflisted('Vimify')
         bd Vimify
     endif
     below new Vimify
-    call append(0, 'Spotify Search Results:')
+    call append(0, a:type . ' Results For: ' . a:query)
     call append(line('$'), "Song                                           
                            \Artist                
                            \Album")
@@ -167,12 +207,23 @@ endfunction
 
 function! s:SelectSong()
    let l:row = getpos('.')[1]-5
+   let l:col = getpos('.')[2]
 python << endpython
 import vim
 row = int(vim.eval("l:row"))
+col = int(vim.eval("l:col"))
 if row >= 0:
-    uri = str(IDs[row]["uri"])
-    vim.command('call s:LoadTrack("{}")'.format(uri))
+    if col < 48:
+        uri = str(IDs[row]["uri"])
+        vim.command('call s:LoadTrack("{}")'.format(uri))
+    elif col < 70:
+        artistID = str(IDs[row]["artistID"])
+        artist = str(ListedElements[row]["artist"])
+        vim.command('call s:SearchArtist("{}", "{}")'.format(artist, artistID))
+    else:
+        albumID = str(IDs[row]["albumID"])
+        album = str(ListedElements[row]["album"])
+        vim.command('call s:SearchAlbum("{}", "{}")'.format(album, albumID))
 endpython
 endfunction
 " *************************************************************************** "
