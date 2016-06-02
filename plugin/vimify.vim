@@ -30,13 +30,13 @@ def populate(track, albumName=None):
     album, albumID = albumName, None
     if album is None:
         album = track["album"]["name"].encode('ascii', 'ignore').replace("'", "")
-        album = track["album"]["id"]
+        albumID = track["album"]["id"]
 
-    t = "{:<45}  {:<20}  {:<}".format(name[:45], artist[:20], album)
-    ListedElements.append(t)
+    info = {"track": name, "artist": artist, "album": album}
+    ListedElements.append(info)
 
-    t = {"uri": uri, "artistID": artistID, "albumID": album}
-    IDs.append(t)
+    info = {"uri": uri, "artistID": artistID, "albumID": album}
+    IDs.append(info)
     
 endpython
 
@@ -152,7 +152,8 @@ function! s:VimifySearchBuffer()
 python << endpython
 import vim
 for element in ListedElements:
-    vim.command('call append(line("$"), "{}")'.format(element))
+    row = "{:<45}  {:<20}  {:<}".format(element["track"][:45], element["artist"][:20], element["album"])
+    vim.command('call append(line("$"), "{}")'.format(row))
 endpython
     resize 14
     normal! gg
@@ -168,7 +169,10 @@ function! s:SelectSong()
    let l:row = getpos('.')[1]-5
 python << endpython
 import vim
-vim.command('call s:LoadTrack("{}")'.format(IDs[int(vim.eval("l:row"))]["uri"]))
+row = int(vim.eval("l:row"))
+if row >= 0:
+    uri = str(IDs[row]["uri"])
+    vim.command('call s:LoadTrack("{}")'.format(uri))
 endpython
 endfunction
 " *************************************************************************** "
