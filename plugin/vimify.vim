@@ -159,8 +159,9 @@ resp = urllib.urlopen(
                     vim.eval("a:artistIDNumber"))
             )
 j = json.loads(resp.read())["items"]
+vim.command('echo "YOOOO"')
 for album in j:
-    vim.command('call s:PopulateAlbum("{}", "{}")'.format(j["name"], j["id"]))
+    vim.command('call s:PopulateAlbum("{}", "{}")'.format(album["name"], album["id"]))
 
 if len(IDs) is 0:
     IDs = oldIDs
@@ -230,6 +231,7 @@ endfunction
 " ***************************   Command Bindngs   *************************** " 
 " *************************************************************************** "
 command!            Spotify     call s:Toggle()
+command!            SpToggle    call s:Toggle()
 command!            SpPause     call s:Pause()
 command!            SpPlay      call s:Play()
 command!            SpSelect    call s:SelectSong()
