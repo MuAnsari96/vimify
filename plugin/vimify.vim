@@ -207,6 +207,7 @@ endpython
     setlocal nowrap
     setlocal buftype=nofile
     map <buffer> <Enter> <esc>:SpSelect<CR>
+    map <buffer> <Space> <esc>:SpToggle<CR>
 
 endfunction
 

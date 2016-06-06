@@ -1,16 +1,16 @@
 *vimify.txt*       Spotify integration for Vim
 *vimify* *vim-spotify* *'vimify'*
 ===============================================================================
-  ____________________________________________________________
- |\                                                           \
- | \___________________________________________________________\
- | |  __   __   __     __    __     __     ______   __  __     |
- | | /\ \ / /  /\ \   /\ "-./  \   /\ \   /\  ___\ /\ \_\ \    |
- | | \ \ \'/   \ \ \  \ \ \-./\ \  \ \ \  \ \  __\ \ \____ \   |
- | |  \ \__|    \ \_\  \ \_\ \ \_\  \ \_\  \ \_\    \/\_____\  |
- \ |   \/_/      \/_/   \/_/  \/_/   \/_/   \/_/     \/_____/  |
-  \|___________________________________________________________|
-
+       ____________________________________________________________
+      |\                                                           \
+      | \___________________________________________________________\
+      | |  __   __   __     __    __     __     ______   __  __     |
+      | | /\ \ / /  /\ \   /\ "-./  \   /\ \   /\  ___\ /\ \_\ \    |
+      | | \ \ \'/   \ \ \  \ \ \-./\ \  \ \ \  \ \  __\ \ \____ \   |
+      | |  \ \__|    \ \_\  \ \_\ \ \_\  \ \_\  \ \_\    \/\_____\  |
+      \ |   \/_/      \/_/   \/_/  \/_/   \/_/   \/_/     \/_____/  |
+       \|___________________________________________________________|
+     
 ===============================================================================
 CONTENTS                                                      *vimify-contents*
 
@@ -22,11 +22,11 @@ CONTENTS                                                      *vimify-contents*
 INTRO                                                            *vimify-intro*
 
 
-Vimify provides full spotify integration for vim. Written in VimL and Python, 
+Vimify provides full Spotify integration for vim. Written in VimL and Python, 
 vimify uses the MPRIS2 dbus interface to control Spotify behavior right from 
 the command bar, making it compatible with all Linux based systems. To search
 for various tracks and information, requests are made directly to the Spotify
-API.
+Web API.
 
 ===============================================================================
 COMMANDS                                                      *vimify-commands*
@@ -36,16 +36,18 @@ The following commands can be used in normal mode to control spotify:
 
 * :SpPlay 				will play the current track
 * :SpPause 				will pause the current track
-* :Spotify 				will toggle play/pause
+* :Spotify or :SpToggle	will toggle play/pause
 * :SpSearch <query>		will search spotify for 'query' and return the results 
-                        in a new buffer. <Enter> will select the result to 
-                        begin playback.
+                        in a new buffer. Depending on the position of the 
+                        cursor, <Enter> will either begin playback of the    
+                        'focused' track, or it will allow the user to browse
+                        through the work of the selected album, or artist.
 
-More features to come!
+
 
 ===============================================================================
 SUPPORT                                                        *vimify-support*
 
 
 This plugin can be found at https://github.com/MuAnsari96/vimify. Please report
-any bugs there, and feel free to contribute!
+any bugs there, and feel free to contribute or fork!
