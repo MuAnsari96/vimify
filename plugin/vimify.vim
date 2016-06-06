@@ -160,8 +160,12 @@ resp = urllib.urlopen(
             )
 j = json.loads(resp.read())["items"]
 vim.command('echo "YOOOO"')
+albums = set()
 for album in j:
-    vim.command('call s:PopulateAlbum("{}", "{}")'.format(album["name"], album["id"]))
+    albumName = album["name"]
+    if albumName.lower() not in albums:
+        albums.add(albumName.lower())
+        vim.command('call s:PopulateAlbum("{}", "{}")'.format(albumName, album["id"]))
 
 if len(IDs) is 0:
     IDs = oldIDs
@@ -194,7 +198,7 @@ python << endpython
 import vim
 for element in ListedElements:
     row = "{:<45}  {:<20}  {:<}".format(element["track"][:45], element["artist"][:20], element["album"])
-    vim.command('call append(line("$"), "{}")'.format(row))
+    vim.command('call append(line("$"), \'{}\')'.format(row))
 endpython
     resize 14
     normal! gg
